@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>കേരള ചരിത്ര ക്വിസ്</title>
+<style>
+  /* Google Fonts for Malayalam */
+  @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&display=swap');
+
+  .quiz-container {
+    font-family: 'Manjari', sans-serif;
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+  }
+
+  .quiz-header {
+    background-color: #00897b; /* Teal color */
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .quiz-header h2 {
+    margin: 0;
+    font-size: 24px;
+  }
+
+  .quiz-body {
+    padding: 20px;
+  }
+
+  .question-section {
+    margin-bottom: 20px;
+  }
+
+  .question-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.5;
+  }
+
+  .options-list {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .option-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Manjari', sans-serif;
+  }
+
+  .option-btn:hover:not([disabled]) {
+    background-color: #e0f2f1;
+    border-color: #00897b;
+  }
+
+  .option-btn.correct {
+    background-color: #c8e6c9;
+    border-color: #4caf50;
+    color: #2e7d32;
+  }
+
+  .option-btn.wrong {
+    background-color: #ffcdd2;
+    border-color: #e57373;
+    color: #c62828;
+  }
+
+  .feedback {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    font-weight: bold;
+  }
+
+  .feedback.correct {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+  }
+
+  .feedback.wrong {
+    color: #c62828;
+    background-color: #ffebee;
+  }
+
+  .quiz-footer {
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .next-btn, .restart-btn {
+    background-color: #00897b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: 'Manjari', sans-serif;
+    display: none; /* Hidden by default */
+  }
+
+  .next-btn:hover, .restart-btn:hover {
+    background-color: #00695c;
+  }
+
+  .score-card {
+    text-align: center;
+    padding: 30px;
+    display: none;
+  }
+
+  .score-text {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .progress {
+    font-size: 14px;
+    color: #666;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="quiz-container" id="keralaHistoryQuiz">
+  <div class="quiz-header">
+    <h2>കേരള ചരിത്ര ക്വിസ്</h2>
+  </div>
+  
+  <div class="quiz-body">
+    <div id="quiz-content">
+      <div class="progress" id="progress">ചോദ്യം 1 / 5</div>
+      <div class="question-section">
+        <div class="question-text" id="question">ചോദ്യം ഇവിടെ വരും...</div>
+        <div class="options-list" id="options">
+          <!-- Options will be injected here -->
+        </div>
+        <div class="feedback" id="feedback"></div>
+      </div>
+    </div>
+
+    <div class="score-card" id="score-card">
+      <div class="score-text" id="final-score"></div>
+      <button class="restart-btn" id="restart-btn" onclick="restartQuiz()">വീണ്ടും ശ്രമിക്കുക</button>
+    </div>
+  </div>
+
+  <div class="quiz-footer">
+    <span id="current-score">സ്കോർ: 0</span>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">അടുത്ത ചോദ്യം</button>
+  </div>
+</div>
+
+<script>
+  const quizData = [
+    {
+      question: "കേരള സിംഹം എന്നറിയപ്പെടുന്നത് ആര്?",
+      options: ["വേലുത്തമ്പി ദളവ", "പഴശ്ശിരാജ", "മാർത്താണ്ഡ വർമ്മ", "ശക്തൻ തമ്പുരാൻ"],
+      answer: 1 // Index of correct answer (Pazhassi Raja)
+    },
+    {
+      question: "കേരള സംസ്ഥാനം രൂപീകൃതമായത് എന്ന്?",
+      options: ["1947 ഓഗസ്റ്റ് 15", "1950 ജനുവരി 26", "1956 നവംബർ 1", "1957 ഏപ്രിൽ 5"],
+      answer: 2 // Nov 1, 1956
+    },
+    {
+      question: "കേരളത്തിലെ ആദ്യത്തെ മുഖ്യമന്ത്രി ആര്?",
+      options: ["ഇ.എം.എസ്. നമ്പൂതിരിപ്പാട്", "പട്ടം താണുപിള്ള", "സി. അച്യുതമേനോൻ", "കെ. കരുണാകരൻ"],
+      answer: 0 // E.M.S.
+    },
+    {
+      question: "വാസ്കോ ഡ ഗാമ കേരളത്തിൽ എവിടെയാണ് കപ്പലിറങ്ങിയത്?",
+      options: ["കൊച്ചി", "കൊല്ലം", "കാപ്പാട് (കോഴിക്കോട്)", "പൊന്നാനി"],
+      answer: 2 // Kappad
+    },
+    {
+      question: "തിരുവിതാംകൂറിലെ അവസാനത്തെ രാജാവ് ആര്?",
+      options: ["സ്വാതി തിരുനാൾ", "ശ്രീ ചിത്തിര തിരുനാൾ", "ധർമ്മരാജ", "ആയിരം തെന്നി"],
+      answer: 1 // Sree Chithira Thirunal
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+  const feedbackEl = document.getElementById("feedback");
+  const nextBtn = document.getElementById("next-btn");
+  const progressEl = document.getElementById("progress");
+  const currentScoreEl = document.getElementById("current-score");
+  const quizContentEl = document.getElementById("quiz-content");
+  const scoreCardEl = document.getElementById("score-card");
+  const finalScoreEl = document.getElementById("final-score");
+  const restartBtn = document.getElementById("restart-btn");
+  const quizFooter = document.querySelector(".quiz-footer");
+
+
+  function loadQuestion() {
+    answered = false;
+    const currentQuiz = quizData[currentQuestionIndex];
+    
+    questionEl.textContent = currentQuiz.question;
+    optionsEl.innerHTML = "";
+    feedbackEl.style.display = "none";
+    nextBtn.style.display = "none";
+    
+    progressEl.textContent = `ചോദ്യം ${currentQuestionIndex + 1} / ${quizData.length}`;
+
+    currentQuiz.options.forEach((option, index) => {
+      const btn = document.createElement("button");
+      btn.classList.add("option-btn");
+      btn.textContent = option;
+      btn.onclick = () => checkAnswer(index, btn);
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedIndex, btn) {
+    if (answered) return;
+    answered = true;
+
+    const currentQuiz = quizData[currentQuestionIndex];
+    const correctIndex = currentQuiz.answer;
+    const options = optionsEl.children;
+
+    if (selectedIndex === correctIndex) {
+      btn.classList.add("correct");
+      feedbackEl.textContent = "ഉത്തരം ശരിയാണ്!";
+      feedbackEl.className = "feedback correct";
+      score++;
+      currentScoreEl.textContent = `സ്കോർ: ${score}`;
+    } else {
+      btn.classList.add("wrong");
+      feedbackEl.textContent = `ഉത്തരം തെറ്റാണ്. ശരിയായ ഉത്തരം: ${currentQuiz.options[correctIndex]}`;
+      feedbackEl.className = "feedback wrong";
+      options[correctIndex].classList.add("correct");
+    }
+
+    feedbackEl.style.display = "block";
+    
+    // Disable all buttons
+    for (let i = 0; i < options.length; i++) {
+        options[i].disabled = true;
+    }
+
+    if (currentQuestionIndex < quizData.length - 1) {
+      nextBtn.style.display = "block";
+    } else {
+      nextBtn.textContent = "ഫലം കാണുക"; // Show Result
+      nextBtn.style.display = "block";
+      nextBtn.onclick = showResult;
+    }
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.length) {
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    quizContentEl.style.display = "none";
+    quizFooter.style.display = "none"; // Hide footer in result view
+    scoreCardEl.style.display = "block";
+    restartBtn.style.display = "inline-block";
+    
+    let message = "";
+    const percentage = (score / quizData.length) * 100;
+    
+    if (percentage === 100) {
+      message = "അത്യുഗ്രം! എല്ലാ ഉത്തരങ്ങളും ശരിയാണ്.";
+    } else if (percentage >= 60) {
+        message = "നന്നായിട്ടുണ്ട്!";
+    } else {
+        message = "കുഴപ്പമില്ല, വീണ്ടും ശ്രമിക്കൂ.";
+    }
+
+    finalScoreEl.innerHTML = `നിങ്ങളുടെ സ്കോർ: ${score} / ${quizData.length}<br><br>${message}`;
+  }
+
+  function restartQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    currentScoreEl.textContent = `സ്കോർ: 0`;
+    scoreCardEl.style.display = "none";
+    quizContentEl.style.display = "block";
+    quizFooter.style.display = "flex"; // Show footer again
+    nextBtn.textContent = "അടുത്ത ചോദ്യം";
+    nextBtn.onclick = nextQuestion;
+    loadQuestion();
+  }
+
+  // Initialize the quiz
+  loadQuestion();
+
+</script>
+</body>
+</html>
+
